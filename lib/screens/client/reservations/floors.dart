@@ -152,10 +152,7 @@ class buildFloor extends StatelessWidget {
                   crossAxisSpacing: 10),
               itemCount: listOfReservation.length,
               itemBuilder: (context, index) {
-                if (DateTime.now().isAfter(listOfReservation[index].start!) &&
-                    DateTime.now().isBefore(listOfReservation[index].end!)) {
-                  return reservedCar();
-                } else if (DateTime.now()
+                if (start // done
                     .isAfter(listOfReservation[index].end!)) {
                   return unReservedCar(
                       context,
@@ -163,13 +160,27 @@ class buildFloor extends StatelessWidget {
                       snapshot.data!.docs[index],
                       start,
                       end);
-                } else if (DateTime.now()
-                    .isBefore(listOfReservation[index].start!)) {
-                  return reservedCar();
+                } else if (end.isBefore(listOfReservation[index].start!)) {
+                  if (end.difference(start).inMinutes <=
+                      listOfReservation[index]
+                          .start!
+                          .difference(end)
+                          .inMinutes) {
+                    return unReservedCar(
+                        context,
+                        listOfReservation[index].placeId!,
+                        snapshot.data!.docs[index],
+                        start,
+                        end);
+                  } else if (start
+                          .isAfter(listOfReservation[index].start!) || // done
+                      start.isBefore(listOfReservation[index].start!)) {
+                    return reservedCar();
+                  } else {
+                    return reservedCar();
+                  }
                 } else {
-                  return Container(
-                    child: Text(""),
-                  );
+                  return reservedCar();
                 }
               });
         } else {
